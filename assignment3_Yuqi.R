@@ -7,17 +7,19 @@ getwd()
 setwd("/Users/apple/Desktop/MSPP/2nd-Semester Course/PPOL 670-Introduction to Data Science/Assignment_3_Words&Ideology")
 
 #1.download the congression data (using code from Sood)
-#https://gist.github.com/soodoku/85d79275c5880f67b4cf
-#output:capitolwords113.csv
+###https://gist.github.com/soodoku/85d79275c5880f67b4cf
+###output:capitolwords113.csv
+###file too large, not included
 
 #2.preprocess the data (using code from Sood)
-#https://github.com/soodoku/Text-as-Data
-#output:cleanedwords.csv
+###https://github.com/soodoku/Text-as-Data
+###output:cleanedwords.csv
+###file too large, not included
 
 #3.download the ideology score data
-#http://voteview.com/dwnomin.htm
-#SL01113D21_PRES_12.DTA
-#HL01113D21_PRES_12.DTA
+###http://voteview.com/dwnomin.htm
+###SL01113D21_PRES_12.DTA
+###HL01113D21_PRES_12.DTA
 
 #4.merge the two datasets (the congression data with ideology score data) using a "bridge data", the Charles Stewart's data.
 
@@ -37,6 +39,7 @@ merged1 <- merge(total, bridge, by="idno")
 merged2 <- merge(merged1, capitolwords, by="bioguide_id")
 write.csv(merged2, "mergeddataset.csv")
 ###output:mergeddataset.csv
+###file too large, not included
 
 
 #5.come up with lists of bigrams and trigrams for replicants and democratics respectively
@@ -93,9 +96,9 @@ write.csv(mergedtrigram, "mergedtrigram.csv")
 
 ###Chi-square test
 ###Calcuate the total of each column in excel, and re-read the dataset into r
-#bigramD:3108783
-#bigramR:2754980
-#bigramT:5863763
+###bigramD:3108783
+###bigramR:2754980
+###bigramT:5863763
 mergedbigramnew <- read.csv("mergedbigram.csv", header = TRUE)
 View(mergedbigramnew)
 bigram_d_freq <- mergedbigramnew[,3]
@@ -122,9 +125,9 @@ write.csv(mergedbigramwithchi_sort_top500,"mergedbigramwithchi_sort_top500.csv")
 
 ###For trigram, do everything again.
 
-#trigramD:660907
-#trigramR:566441
-#trigramT:1227348
+###trigramD:660907
+###trigramR:566441
+###trigramT:1227348
 mergedtrigramnew <- read.csv("mergedtrigram.csv", header = TRUE)
 View(mergedtrigramnew)
 
@@ -165,6 +168,7 @@ write.csv(ta,"ta.csv")
 
 ###Used excel to merge the ta dataset with the dataset that has the ideology score
 ###output:mergeddataset_new_clean.csv
+###file too large, not included
 mergeddataset_new_clean <- read.csv("mergeddataset_new_clean.csv", header = TRUE)
 ###come up with the function that read through the speaking cells and assignmet values 1 or 0 to the 500 bigram dummy vairables.
 View(mergeddataset_new_clean)
@@ -204,14 +208,14 @@ write.csv(mergeddataset_new_clean_sample,"mergeddataset_new_clean_sample.csv")
 
 
 
-###OLS model
+###OLS Model
 mergedbigramwithchi_sort_top500 <- read.csv("mergedbigramwithchi_sort_top500.csv", header = TRUE)
 View(mergedbigramwithchi_sort_top500)
 fit <- lm(dwnom1 ~ .-dwnom1 -Name.in.Bridge.dataset -speaker_party -speaking, data = mergeddataset_new_clean_sample)
 summary(fit)
 
 
-###Ridge model
+###Ridge Model
 library(glmnet)
 library(ISLR)
 
@@ -264,8 +268,7 @@ predict(out,type="coefficients",s=bestlam)[1:20,]
 
 
 
-
-###Lasso
+###Lasso Model
 lasso.mod=glmnet(x[train ,],y[train],alpha=1,lambda=grid)
 plot(lasso.mod)
 
