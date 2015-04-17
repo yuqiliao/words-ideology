@@ -1,0 +1,36 @@
+---
+Assignment 3
+Yuqi Liao
+802642182
+April 13, 2015
+---
+#Introduction:
+
+This project tries to explore the relationship between ideology and words. I plan to to build a validated model of words and ideology of the congressperson. I've gone through the following process.
+
+#Process:
+1- Use the sunlight foundation API to download the congressional record for the latest (113th) congress (Senate and House). Using the script by Gaurav Sood, the data is well structured to reflect infomation including the speaker, his or her party and the speech.
+
+2- Clean up data, using code from Gaurav Sood. In particualr, remove stop words, stem the words, remove special characters, numbers, capitalization etc.  
+
+3- Download ideology scores from voteview.com.
+
+4- Merge the cleaned speech data with with ideology scores from voteview.com (DW-Nominate, 1st dimension). Regarding the fact that the names in the two datasets are not the same, I use the a csv file found online as a bridge that matches up ICPSR IDs to Bioguide IDs using Charles Stewart's data, and the Sunlight Labs Congress API.
+
+5- Turn the merged data into bigram and trigram using similar codes. Keep only top 500 bigrams, top 500 trigrams sorted by the chi-square statistics. (The chi-square test function is based on the paper suggested by Gaurav Sood)
+
+6- Come up with the top 100 republican and democrat bigrams and trigrams in a text file.
+
+7- Modeling. I've tried various approaches and found two that make more sense and have explored a bit further. However due to the time constraint I did not end up getting the exact model output. I will try to explain the directions that I tried to explore futher.
+
+7.1- First approach is try to come up with a matrix with 50x columns. The first column is the name of the congressperson, the second column is their party, the third is their speeches, the fourth their ideology score(These four columns all come from the merged data set that has been generated, which has more than one row for each congressperson). The rest 1000 columns consist the top 500 bigram by chi-square statistics and the top 500 trigram. Then I tried to find a function in r or in other tools that can reading in the speech cell of each row and assign value "1" to a bigram or trigram cell for that row if the bigram or trigram phrase in mentioned in the speech. For example, the congressperson in the first row has a cell about speech. If the term "climate change" is mentioned in the speech, the value in that row under the dummy variable "climate change" is defined as "1", otherwise it is "0". After this process, I try to run a OLS regression, in which I regress the ideology score on the 1000 dummy variables. I can then try to interpret the output as to which bigrams/trigrams have the most significant impact on the ideology score.
+
+7.2- Another approach is try to follow the lab on Ridge Regression and the Lasso in the textbook. I think that will work out eventually, however, I was caught in the problem that R is running nonstop to process one of the very first command in the lab. Later on, I also have difficulty in using the library glmnet after installing the package. The error message suggests taht I need to update my R, however, when I did update it, the error message remains the same.
+
+
+
+
+
+
+
+
