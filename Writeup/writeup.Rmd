@@ -1,0 +1,96 @@
+---
+Assignment 3
+Yuqi Liao
+802642182
+April 13, 2015
+---
+#Introduction:
+
+This project tries to explore the relationship between ideology and words. I build a validated model of words and ideology of the congressperson. I've gone through the following process.
+
+#Process:
+1- Use the sunlight foundation API to download the congressional record for the latest (113th) congress (Senate and House). Using the script by Gaurav Sood, the data is well structured to reflect infomation including the speaker, his or her party and the speech.
+
+2- Clean up data, using code from Gaurav Sood. In particualr, remove stop words, stem the words, remove special characters, numbers, capitalization etc.  
+
+3- Download ideology scores from voteview.com.
+
+4- Merge the cleaned speech data with with ideology scores from voteview.com (DW-Nominate, 1st dimension). Regarding the fact that the names in the two datasets are not the same, I use the a csv file named Charles Stewart's data found online as a bridge that matches up ICPSR IDs to Bioguide IDs.
+
+5- Turn the merged data into bigram and trigram using similar codes. Keep only top 500 bigrams, top 500 trigrams sorted by the chi-square statistics. (The chi-square test function is based on the paper suggested by Gaurav Sood)
+
+6- Come up with the top 100 republican and democrat bigrams and trigrams in a text file following on the chi-square test results. They indicate that there are statistically significantly different usage of bigrams and trigrams by the two party members. For example, when "climate change" is mentioned, it is more likely to be said from a democratic congressperson other than a republican one. The following modeling part have more details to support this argument.
+
+7- Modeling. I've used a simplest OLS model as well as a more nuanced Ridged and Lasso model to approach this. The three models unsurpringly yields similar results, which again supports some preliminary findings by the chi-sqaure tests. 
+
+To try to use these three models, the first thing to do is to come up with a matrix with 504 columns. The first four columns include the name of the congressperson, their party, their speeches and their ideology score (These four columns all come from the merged data set that has been generated, which has more than one row for each congressperson). The rest 500 columns consist the top 500 bigram by chi-square statistics (there will be similar logic for the top 500 trigram analysis, due to the time constraint, this part is skipped.) Then I try to construct a function in r to read through the speech cells of each row and assign value "1" to a bigram or trigram cell for that row if the bigram or trigram phrase in mentioned in the speech. For example, the congressperson in the first row has a cell about speech. If the term "climate change" is mentioned in the speech, the value in that row under the dummy variable "climate change" is defined as "1", otherwise it is "0". After this process, I try to run a OLS regression, in which I regress the ideology score on the 500 dummy variables. I can then try to interpret the output as to which bigrams/trigrams have the most significant impact on the ideology score. Following the guidance of the Introduction to Statistical Learning textbook, I build the Ridged and Lasso model with cross-validation and foudn similar results.
+
+
+#Output
+A more detailed version could be seen at Assignment 3-write-up in txt format.txt
+
+1- OLS
+Call:
+lm(formula = dwnom1 ~ . - dwnom1 - Name.in.Bridge.dataset - speaker_party - 
+    speaking, data = mergeddataset_new_clean_sample)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-0.9544 -0.2477  0.0000  0.1547  1.1214 
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.5483 on 250 degrees of freedom
+Multiple R-squared:  0.5236,  Adjusted R-squared:  0.0491 
+F-statistic: 1.103 on 249 and 250 DF,  p-value: 0.2186
+
+
+
+2 - Ridged
+
+> out=glmnet(x,y,alpha=0)
+> predict(out,type="coefficients",s=bestlam)[1:20,]
+        (Intercept)      speaker_partyD      speaker_partyI 
+       0.0868079655       -0.0857478339        0.0000000000 
+     speaker_partyR        climat.chang           mr.presid 
+       0.0857477294       -0.0040521634       -0.0095258438 
+     unanim.consent          presid.ask        minimum.wage 
+      -0.0111628599       -0.0115607724       -0.0360394301 
+           care.law          ask.unanim       senat.proceed 
+       0.0109106062       -0.0120100353       -0.0215779642 
+republican.colleagu       session.senat        meet.session 
+      -0.0185957708       -0.0156655247       -0.0156654596 
+       rhode.island         author.meet     obama.administr 
+      -0.0007068405       -0.0156654351        0.0025567446 
+         eagl.scout            new.york 
+       0.0180866225       -0.0258908013
+
+
+
+
+3 Lasso
+
+
+
+> out=glmnet(x,y,alpha=1,lambda=grid)
+> lasso.coef=predict(out,type="coefficients",s=bestlam)[1:20,]
+> lasso.coef
+        (Intercept)      speaker_partyD      speaker_partyI 
+       6.440303e-01       -1.039351e+00        0.000000e+00 
+     speaker_partyR        climat.chang           mr.presid 
+       2.798155e-18        0.000000e+00       -1.168799e-02 
+     unanim.consent          presid.ask        minimum.wage 
+       0.000000e+00        0.000000e+00        0.000000e+00 
+           care.law          ask.unanim       senat.proceed 
+       0.000000e+00        0.000000e+00        0.000000e+00 
+republican.colleagu       session.senat        meet.session 
+       0.000000e+00        0.000000e+00        0.000000e+00 
+       rhode.island         author.meet     obama.administr 
+       0.000000e+00        0.000000e+00        0.000000e+00 
+         eagl.scout            new.york 
+       0.000000e+00        0.000000e+00
+
+
+#Top 100 republican and democrat bigrams and trigrams
+A more detailed version could be seen at Assignment 3-write-up in txt format.txt
+
+
